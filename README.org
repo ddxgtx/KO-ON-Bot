@@ -4,7 +4,8 @@
 ** linux部署方法
 
 *** 配置Config
-点击右上角fork到自己仓库在自己仓库内编辑config.json文件
+点击右上角fork到自己仓库
+在自己仓库内编辑config.json文件
 1. Rename ~config.tmp.json~ to ~config.json~
 2. Fill Keywords with value
    - ~token*~: KOOK Bot token for bot *
