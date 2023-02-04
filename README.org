@@ -2,6 +2,13 @@
 一个kook（原开黑啦）点歌机器人
 
 ** linux部署方法
+https://developer.kookapp.cn/app/index
+
+***创建自己的机器人
+#+BEGIN_SRC bash
+https://developer.kookapp.cn/app/index
+#+END_SRC
+创建机器人后在机器人栏中获取token
 
 *** 配置Config
 点击右上角fork到自己仓库
