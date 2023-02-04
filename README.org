@@ -1,5 +1,6 @@
 * KO-ON Bot
 一个kook（原开黑啦）点歌机器人
+
 ** linux部署方法
 *** Download
 #+BEGIN_SRC bash
@@ -9,6 +10,28 @@ git clone https://github.com/Binaryify/NeteaseCloudMusicApi.git
 git clone https://github.com/jsososo/QQMusicApi.git
 git clone https://github.com/jsososo/MiguMusicApi.git
 #+END_SRC
+
+*** 安装nodejs
+#+BEGIN_SRC bash
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+#+END_SRC
+
+*** 安装依赖
+#+BEGIN_SRC bash
+cd NeteaseCloudMusicApi
+npm install
+cd QQMusicApi
+npm install
+cd MiguMusicApi
+npm install
+#+END_SRC
+
+*** 安装ffmpeg
+#+BEGIN_SRC bash
+sudo apt install ffmpeg
+#+END_SRC
+
 *** 配置Config
 1. Rename ~config.tmp.json~ to ~config.json~
 2. Fill Keywords with value
