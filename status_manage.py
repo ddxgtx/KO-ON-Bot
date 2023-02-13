@@ -146,7 +146,7 @@ def get_netease_headers(netease_cookie: str) -> dict:
     return headers
 
 
-def get_helpcm(default_platform: str, join_command: str) -> list:
+def get_helpcm(default_platform: str) -> list:
     helpcm = [{
         "type":
         "card",
@@ -159,34 +159,6 @@ def get_helpcm(default_platform: str, join_command: str) -> list:
             "text": {
                 "type": "plain-text",
                 "content": "点歌机操作指南"
-            }
-        }, {
-            "type": "divider"
-        }, {
-            "type": "section",
-            "text": {
-                "type": "kmarkdown",
-                "content": f"**-1.  {join_command}**"
-            }
-        }, {
-            "type": "section",
-            "text": {
-                "type": "kmarkdown",
-                "content": "功能:    让bot加入语音"
-            }
-        }, {
-            "type": "divider"
-        }, {
-            "type": "section",
-            "text": {
-                "type": "kmarkdown",
-                "content": "**0.  退出语音**"
-            }
-        }, {
-            "type": "section",
-            "text": {
-                "type": "kmarkdown",
-                "content": "功能:    让bot退出语音"
             }
         }, {
             "type": "divider"
@@ -415,7 +387,7 @@ async def getInformation(duration: dict, deltatime: int, bvid: str, guild: str,
     return item
 
 
-async def getAudio(guild: str, item: list, botid: str, bili_cookie:str,session: ClientSession):
+async def getAudio(guild: str, item: list, botid: str, session: ClientSession):
     baseUrl = 'http://api.bilibili.com/x/player/playurl?fnval=16&'
     bvid, cid, title, mid, name, pic = item[0], item[1], item[2], item[
         3], item[4], item[5]
@@ -432,8 +404,7 @@ async def getAudio(guild: str, item: list, botid: str, bili_cookie:str,session: 
         'Referer':
         'https://api.bilibili.com/x/web-interface/view?bvid=' + bvid,
         'Origin': 'https://www.bilibili.com',
-        'Connection': 'keep-alive',
-        'cookie': bili_cookie
+        'Connection': 'keep-alive'
     }
     async with session.get(url=audioUrl,
                            headers=headers,
@@ -495,16 +466,6 @@ async def delmsg(msg_id: str, config: dict, botid: str, session: ClientSession,
                             headers=headers,
                             timeout=ClientTimeout(total=5)) as r:
         logger.warning(await r.text())
-
-
-async def vcch_usrlist(voice_id: str, config: dict, botid: str,
-                       session: ClientSession) -> dict:
-    url = f'https://www.kookapp.cn/api/v3/channel/user-list?channel_id={voice_id}'
-    headers = {"Authorization": "Bot " + config['token' + botid]}
-    async with session.get(url=url,
-                           headers=headers,
-                           timeout=ClientTimeout(total=5)) as r:
-        return await r.json()
 
 
 async def uptmsg(msg_id: str, content: str, config: dict, botid: str,
@@ -619,10 +580,13 @@ async def start(voice: Voice, voiceid: str, guild: str, voiceffmpeg: dict,
 async def voice_Engine(voice: Voice, voiceid: str, guild: str,
                        voiceffmpeg: dict, port: dict, logger: Logger):
     logger.warning(voiceid)
+    rtp_url = ''
     voice.channel_id = voiceid
     while True:
         if len(voice.rtp_url) != 0:
-            comm = f"ffmpeg -re -loglevel debug -nostats -stream_loop -1 -i zmq:tcp://127.0.0.1:{port[guild]} -map 0:a:0 -acodec libopus -ab 128k -filter:a volume=0.15 -ac 2 -ar 48000 -f tee [select=a:f=rtp:ssrc={voice.ssrc}:payload_type=100]{voice.rtp_url}"
+            rtp_url = voice.rtp_url
+            comm = "ffmpeg -re -loglevel debug -nostats -stream_loop -1 -i zmq:tcp://127.0.0.1:" + port[
+                guild] + " -map 0:a:0 -acodec libopus -ab 128k -filter:a volume=0.15 -ac 2 -ar 48000 -f tee [select=a:f=rtp:ssrc=1357:payload_type=100]" + rtp_url
             logger.warning(comm)
             voiceffmpeg[guild] = Popen(comm,
                                        shell=True,
@@ -663,8 +627,6 @@ async def disconnect(bot: Bot, guild: str, voice: dict, timeout: dict,
     await bot.client.update_listening_music(f"已用槽位:{str(len(voice))}", "KO-ON",
                                             SoftwareTypes.CLOUD_MUSIC)
     logger.warning(str(guild) + " disconnected")
-
-
 @func_set_timeout(7)
 def delay_alignment(p: Popen, run_status: dict, logger: Logger):
     while p.poll() is None:
